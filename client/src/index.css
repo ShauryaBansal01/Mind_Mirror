@@ -48,6 +48,118 @@
   .gradient-secondary {
     @apply bg-gradient-to-br from-secondary-500 via-secondary-600 to-secondary-700;
   }
+
+  /* Chart animations */
+  .chart-enter {
+    animation: chartFadeIn 0.8s ease-out;
+  }
+  
+  @keyframes chartFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Mood indicators */
+  .mood-happy { @apply text-green-500 bg-green-50 border-green-200; }
+  .mood-sad { @apply text-blue-500 bg-blue-50 border-blue-200; }
+  .mood-anxious { @apply text-yellow-500 bg-yellow-50 border-yellow-200; }
+  .mood-angry { @apply text-red-500 bg-red-50 border-red-200; }
+  .mood-neutral { @apply text-gray-500 bg-gray-50 border-gray-200; }
+  .mood-excited { @apply text-purple-500 bg-purple-50 border-purple-200; }
+  .mood-stressed { @apply text-orange-500 bg-orange-50 border-orange-200; }
+  .mood-calm { @apply text-cyan-500 bg-cyan-50 border-cyan-200; }
+  .mood-frustrated { @apply text-red-600 bg-red-50 border-red-300; }
+  .mood-content { @apply text-green-600 bg-green-50 border-green-300; }
+
+  /* Progress bars */
+  .progress-bar {
+    @apply w-full bg-gray-200 rounded-full h-2 overflow-hidden;
+  }
+  
+  .progress-fill {
+    @apply h-full rounded-full transition-all duration-500 ease-out;
+  }
+
+  /* Stat cards */
+  .stat-card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200;
+  }
+  
+  .stat-icon {
+    @apply w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4;
+  }
+
+  /* Analytics specific */
+  .analytics-grid {
+    @apply grid gap-6;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+  
+  .chart-container {
+    @apply bg-white rounded-xl shadow-sm border border-gray-200 p-6;
+  }
+  
+  .chart-header {
+    @apply flex items-center justify-between mb-6;
+  }
+  
+  .chart-title {
+    @apply text-lg font-semibold text-gray-900;
+  }
+  
+  .chart-subtitle {
+    @apply text-sm text-gray-500;
+  }
+
+  /* Tooltip styles */
+  .custom-tooltip {
+    @apply bg-white border border-gray-200 rounded-lg shadow-lg p-3;
+  }
+  
+  .tooltip-label {
+    @apply text-sm font-medium text-gray-900;
+  }
+  
+  .tooltip-value {
+    @apply text-sm text-gray-600;
+  }
+
+  /* Loading states */
+  .skeleton {
+    @apply animate-pulse bg-gray-200 rounded;
+  }
+  
+  .skeleton-text {
+    @apply h-4 bg-gray-200 rounded animate-pulse;
+  }
+  
+  .skeleton-circle {
+    @apply rounded-full bg-gray-200 animate-pulse;
+  }
+
+  /* Responsive chart containers */
+  .chart-responsive {
+    @apply w-full;
+    height: 300px;
+  }
+  
+  @media (min-width: 768px) {
+    .chart-responsive {
+      height: 350px;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .chart-responsive {
+      height: 400px;
+    }
+  }
   
   .gradient-accent {
     @apply bg-gradient-to-br from-accent-500 via-accent-600 to-accent-700;

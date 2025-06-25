@@ -562,4 +562,142 @@ router.get('/dashboard', authenticateToken, async (req, res) => {
   }
 });
 
+// @route   GET /api/analytics/cognitive-distortions
+// @desc    Get user's cognitive distortions summary (for frontend compatibility)
+// @access  Private
+router.get('/cognitive-distortions', authenticateToken, async (req, res) => {
+  try {
+    const { days = 30 } = req.query;
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - parseInt(days));
+
+    const distortions = await JournalEntry.aggregate([
+      {
+        $match: {
+          userId: req.user._id,
+          createdAt: { $gte: startDate },
+          'aiAnalysis.processed': true
+        }
+      },
+      { $unwind: "$aiAnalysis.distortions" },
+      {
+        $group: {
+          _id: "$aiAnalysis.distortions.type",
+          count: { $sum: 1 },
+          avgConfidence: { $avg: "$aiAnalysis.distortions.confidence" }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          type: "$_id",
+          count: 1,
+          avgConfidence: 1
+        }
+      },
+      { $sort: { count: -1 } }
+    ]);
+
+    res.json({ distortions });
+  } catch (error) {
+    console.error('Cognitive distortions error:', error);
+    res.status(500).json({
+      message: 'Server error while fetching cognitive distortions',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+// @route   GET /api/analytics/journal-stats
+// @desc    Get user's journal stats summary (for frontend compatibility)
+// @access  Private
+router.get('/journal-stats', authenticateToken, async (req, res) => {
+  try {
+    const { days = 30 } = req.query;
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - parseInt(days));
+
+    // Total entries, avg mood score, streak, improvement rate
+    const stats = await JournalEntry.aggregate([
+      {
+        $match: {
+          userId: req.user._id,
+          createdAt: { $gte: startDate }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          totalEntries: { $sum: 1 },
+          avgMoodScore: { $avg: "$moodIntensity" },
+          firstEntry: { $min: "$createdAt" },
+          lastEntry: { $max: "$createdAt" }
+        }
+      }
+    ]);
+
+    // Calculate streak (consecutive days with entries)
+    let streakDays = 0;
+    if (stats[0]) {
+      const entries = await JournalEntry.find({
+        userId: req.user._id,
+        createdAt: { $gte: startDate }
+      }).sort({ createdAt: -1 }).select('createdAt');
+      let lastDate = null;
+      for (const entry of entries) {
+        const entryDate = entry.createdAt;
+        if (!lastDate) {
+          lastDate = entryDate;
+          streakDays = 1;
+        } else {
+          const diff = Math.floor((lastDate - entryDate) / (1000 * 60 * 60 * 24));
+          if (diff === 1) {
+            streakDays++;
+            lastDate = entryDate;
+          } else if (diff > 1) {
+            break;
+          }
+        }
+      }
+    }
+
+    // Improvement rate: compare avg mood score to previous period
+    let improvementRate = 0;
+    if (stats[0]) {
+      const prevStart = new Date(startDate);
+      prevStart.setDate(prevStart.getDate() - parseInt(days));
+      const prevStats = await JournalEntry.aggregate([
+        {
+          $match: {
+            userId: req.user._id,
+            createdAt: { $gte: prevStart, $lt: startDate }
+          }
+        },
+        {
+          $group: {
+            _id: null,
+            avgMoodScore: { $avg: "$moodIntensity" }
+          }
+        }
+      ]);
+      if (prevStats[0] && prevStats[0].avgMoodScore) {
+        improvementRate = ((stats[0].avgMoodScore - prevStats[0].avgMoodScore) / prevStats[0].avgMoodScore) * 100;
+      }
+    }
+
+    res.json({
+      totalEntries: stats[0]?.totalEntries || 0,
+      avgMoodScore: stats[0]?.avgMoodScore || 0,
+      streakDays,
+      improvementRate: Number(improvementRate.toFixed(1))
+    });
+  } catch (error) {
+    console.error('Journal stats error:', error);
+    res.status(500).json({
+      message: 'Server error while fetching journal stats',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
 module.exports = router;
