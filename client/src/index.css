@@ -1,0 +1,115 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer base {
+  * {
+     @apply border-gray-200;;
+  }
+  
+  body {
+    @apply bg-white text-gray-900 font-sans;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  /* Custom scrollbar */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(203 213 225) transparent;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgb(203 213 225);
+    border-radius: 3px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(148 163 184);
+  }
+
+  /* Gradient backgrounds */
+  .gradient-primary {
+    @apply bg-gradient-to-br from-primary-500 via-primary-600 to-primary-700;
+  }
+  
+  .gradient-secondary {
+    @apply bg-gradient-to-br from-secondary-500 via-secondary-600 to-secondary-700;
+  }
+  
+  .gradient-accent {
+    @apply bg-gradient-to-br from-accent-500 via-accent-600 to-accent-700;
+  }
+
+  /* Glass morphism effect */
+  .glass {
+    @apply bg-white/10 backdrop-blur-md border border-white/20;
+  }
+  
+  .glass-dark {
+    @apply bg-gray-900/10 backdrop-blur-md border border-gray-700/20;
+  }
+
+  /* Button variants */
+  .btn-primary {
+    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium px-4 py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+  }
+  
+  .btn-ghost {
+    @apply bg-transparent hover:bg-gray-100 text-gray-700 font-medium px-4 py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+  }
+
+  /* Input styles */
+  .input-primary {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200;
+  }
+
+  /* Card styles */
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-200 p-6;
+  }
+  
+  .card-hover {
+    @apply card hover:shadow-md transition-shadow duration-200;
+  }
+
+  /* Mood color utilities */
+  .mood-very-happy { @apply text-green-500 bg-green-50 border-green-200; }
+  .mood-happy { @apply text-lime-500 bg-lime-50 border-lime-200; }
+  .mood-content { @apply text-yellow-500 bg-yellow-50 border-yellow-200; }
+  .mood-neutral { @apply text-gray-500 bg-gray-50 border-gray-200; }
+  .mood-slightly-sad { @apply text-orange-500 bg-orange-50 border-orange-200; }
+  .mood-sad { @apply text-red-500 bg-red-50 border-red-200; }
+  .mood-very-sad { @apply text-red-600 bg-red-50 border-red-300; }
+  .mood-anxious { @apply text-purple-500 bg-purple-50 border-purple-200; }
+  .mood-stressed { @apply text-amber-500 bg-amber-50 border-amber-200; }
+  .mood-angry { @apply text-red-600 bg-red-50 border-red-300; }
+  .mood-frustrated { @apply text-orange-600 bg-orange-50 border-orange-300; }
+  .mood-excited { @apply text-cyan-500 bg-cyan-50 border-cyan-200; }
+  .mood-grateful { @apply text-emerald-500 bg-emerald-50 border-emerald-200; }
+  .mood-hopeful { @apply text-blue-500 bg-blue-50 border-blue-200; }
+  .mood-confused { @apply text-indigo-500 bg-indigo-50 border-indigo-200; }
+  .mood-overwhelmed { @apply text-violet-500 bg-violet-50 border-violet-200; }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
