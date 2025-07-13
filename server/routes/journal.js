@@ -1,14 +1,81 @@
 const express = require('express');
 const JournalEntry = require('../models/JournalEntry');
 const { authenticateToken } = require('../middleware/auth');
-const { validateJournalEntry } = require('../middleware/validation');
+const { validateJournalEntry, validateJournalEntryWithAI } = require('../middleware/validation');
+const aiService = require('../services/aiService');
 
 const router = express.Router();
 
 // @route   POST /api/journal
-// @desc    Create a new journal entry
+// @desc    Create a new journal entry with AI mood detection
 // @access  Private
-router.post('/', authenticateToken, validateJournalEntry, async (req, res) => {
+router.post('/', authenticateToken, validateJournalEntryWithAI, async (req, res) => {
+  try {
+    const {
+      title,
+      content,
+      mood,
+      moodIntensity,
+      tags,
+      isImportant,
+      aiDetectedMood
+    } = req.body;
+
+    let finalMood = mood;
+    let moodDetectionResult = null;
+
+    // If no mood provided or AI detection requested, detect mood using AI
+    if (!mood || aiDetectedMood) {
+      try {
+        moodDetectionResult = await aiService.detectMood(content, title);
+        finalMood = moodDetectionResult.mood;
+        
+        console.log(`AI detected mood: ${finalMood} (confidence: ${moodDetectionResult.confidence})`);
+      } catch (moodError) {
+        console.error('Mood detection failed:', moodError);
+        // Fallback to provided mood or neutral
+        finalMood = mood || 'neutral';
+      }
+    }
+
+    const journalEntry = new JournalEntry({
+      userId: req.user._id,
+      title,
+      content,
+      mood: finalMood,
+      moodIntensity: moodIntensity || 5,
+      tags: tags || [],
+      isImportant: isImportant || false
+    });
+
+    await journalEntry.save();
+
+    res.status(201).json({
+      message: 'Journal entry created successfully',
+      entry: journalEntry,
+      moodDetection: moodDetectionResult ? {
+        detectedMood: moodDetectionResult.mood,
+        confidence: moodDetectionResult.confidence,
+        explanation: moodDetectionResult.explanation,
+        aiDetected: true
+      } : {
+        aiDetected: false
+      }
+    });
+
+  } catch (error) {
+    console.error('Create journal entry error:', error);
+    res.status(500).json({
+      message: 'Server error while creating journal entry',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+// @route   POST /api/journal/manual
+// @desc    Create a new journal entry with manual mood selection (legacy endpoint)
+// @access  Private
+router.post('/manual', authenticateToken, validateJournalEntry, async (req, res) => {
   try {
     const {
       title,
@@ -33,7 +100,10 @@ router.post('/', authenticateToken, validateJournalEntry, async (req, res) => {
 
     res.status(201).json({
       message: 'Journal entry created successfully',
-      entry: journalEntry
+      entry: journalEntry,
+      moodDetection: {
+        aiDetected: false
+      }
     });
 
   } catch (error) {

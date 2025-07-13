@@ -305,6 +305,49 @@ router.post('/reanalyze/:entryId', authenticateToken, async (req, res) => {
   }
 });
 
+// @route   POST /api/ai/detect-mood
+// @desc    Detect mood from journal content using AI
+// @access  Private
+router.post('/detect-mood', authenticateToken, async (req, res) => {
+  try {
+    const { content, title } = req.body;
+
+    if (!content || content.trim().length === 0) {
+      return res.status(400).json({
+        message: 'Content is required for mood detection'
+      });
+    }
+
+    // Minimum content length for reliable mood detection
+    if (content.trim().length < 10) {
+      return res.status(400).json({
+        message: 'Content too short for reliable mood detection. Please write at least a few words.'
+      });
+    }
+
+    // Detect mood using AI
+    const moodResult = await aiService.detectMood(content, title || '');
+
+    res.json({
+      message: 'Mood detected successfully',
+      mood: moodResult.mood,
+      confidence: moodResult.confidence,
+      explanation: moodResult.explanation,
+      error: moodResult.error || null
+    });
+
+  } catch (error) {
+    console.error('Mood detection error:', error);
+    res.status(500).json({
+      message: 'Server error during mood detection',
+      mood: 'neutral',
+      confidence: 0.5,
+      explanation: 'Error occurred during mood detection, defaulting to neutral',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
 // @route   POST /api/ai/chat
 // @desc    Friendly AI chat for journal entry
 // @access  Private

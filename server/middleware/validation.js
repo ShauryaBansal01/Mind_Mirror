@@ -74,7 +74,7 @@ const validateUserLogin = [
   handleValidationErrors
 ];
 
-// Journal entry validation
+// Journal entry validation (with required mood)
 const validateJournalEntry = [
   body('title')
     .trim()
@@ -120,6 +120,62 @@ const validateJournalEntry = [
     .optional()
     .isBoolean()
     .withMessage('isImportant must be a boolean'),
+  
+  handleValidationErrors
+];
+
+// Journal entry validation with AI-detected mood (mood is optional)
+const validateJournalEntryWithAI = [
+  body('title')
+    .trim()
+    .notEmpty()
+    .withMessage('Entry title is required')
+    .isLength({ max: 200 })
+    .withMessage('Title cannot exceed 200 characters'),
+  
+  body('content')
+    .trim()
+    .notEmpty()
+    .withMessage('Entry content is required')
+    .isLength({ min: 10 })
+    .withMessage('Content must be at least 10 characters for AI mood detection')
+    .isLength({ max: 10000 })
+    .withMessage('Content cannot exceed 10,000 characters'),
+  
+  body('mood')
+    .optional()
+    .isIn([
+      'very-happy', 'happy', 'content', 'neutral', 'slightly-sad', 
+      'sad', 'very-sad', 'anxious', 'stressed', 'angry', 'frustrated', 
+      'excited', 'grateful', 'hopeful', 'confused', 'overwhelmed'
+    ])
+    .withMessage('Invalid mood selection'),
+  
+  body('moodIntensity')
+    .optional()
+    .isInt({ min: 1, max: 10 })
+    .withMessage('Mood intensity must be between 1 and 10'),
+  
+  body('tags')
+    .optional()
+    .isArray()
+    .withMessage('Tags must be an array'),
+  
+  body('tags.*')
+    .optional()
+    .trim()
+    .isLength({ max: 30 })
+    .withMessage('Each tag cannot exceed 30 characters'),
+  
+  body('isImportant')
+    .optional()
+    .isBoolean()
+    .withMessage('isImportant must be a boolean'),
+  
+  body('aiDetectedMood')
+    .optional()
+    .isBoolean()
+    .withMessage('aiDetectedMood must be a boolean'),
   
   handleValidationErrors
 ];
@@ -193,6 +249,7 @@ module.exports = {
   validateUserRegistration,
   validateUserLogin,
   validateJournalEntry,
+  validateJournalEntryWithAI,
   validateProfileUpdate,
   validatePasswordChange,
   handleValidationErrors

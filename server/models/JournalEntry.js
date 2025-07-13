@@ -1,19 +1,34 @@
 const mongoose = require('mongoose');
 
-// Define cognitive distortion types based on CBT principles
+// Define cognitive distortion types based on CBT principles (David Burns + Modern CBT)
 const COGNITIVE_DISTORTIONS = [
-  'all-or-nothing',      // Black and white thinking
-  'overgeneralization',  // Drawing broad conclusions from single events
-  'mental-filter',       // Focusing only on negatives
-  'disqualifying-positive', // Dismissing positive experiences
-  'jumping-to-conclusions', // Mind reading or fortune telling
-  'magnification',       // Catastrophizing or minimizing
-  'emotional-reasoning', // Assuming feelings reflect reality
-  'should-statements',   // Unrealistic expectations
-  'labeling',           // Negative self-labeling
-  'personalization',    // Taking responsibility for things outside control
-  'comparison',         // Unfair comparisons to others
-  'blame'               // Blaming self or others excessively
+  // Core David Burns Cognitive Distortions
+  'all-or-nothing',           // Black and white thinking
+  'overgeneralization',       // Drawing broad conclusions from single events
+  'mental-filter',            // Focusing only on negatives
+  'disqualifying-positive',   // Dismissing positive experiences
+  'mind-reading',             // Assuming you know what others think
+  'fortune-telling',          // Predicting negative outcomes
+  'magnification',            // Catastrophizing - exaggerating negatives
+  'minimization',             // Downplaying positives
+  'emotional-reasoning',      // Assuming feelings reflect reality
+  'should-statements',        // Unrealistic expectations with should/must
+  'labeling',                 // Negative self-labeling or labeling others
+  'self-blame',               // Blaming yourself for things outside your control
+  'other-blame',              // Blaming others and overlooking your contribution
+  
+  // Additional Modern CBT Cognitive Distortions
+  'personalization',          // Taking responsibility for external events
+  'control-fallacy',          // Believing you have total control or no control
+  'fallacy-of-fairness',      // Measuring everything by fairness standards
+  'heavens-reward-fallacy',   // Expecting automatic rewards for good deeds
+  'always-being-right',       // Constantly needing to prove you're right
+  'comparison',               // Unfair comparisons to others
+  'filtering',                // Focusing on single negative detail
+  'global-labeling',          // Making global judgments from single events
+  'perfectionism',            // Setting unrealistically high standards
+  'approval-seeking',         // Needing constant approval from others
+  'change-fallacy'            // Believing others must change for you to be happy
 ];
 
 const MOOD_TYPES = [

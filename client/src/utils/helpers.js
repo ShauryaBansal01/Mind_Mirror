@@ -93,68 +93,131 @@ export const getMoodLabel = (mood) => {
   return moodLabels[mood] || 'Unknown';
 };
 
-// Cognitive distortion utilities
+// Comprehensive cognitive distortion utilities (David Burns + Modern CBT)
 export const getDistortionInfo = (type) => {
   const distortions = {
+    // Core David Burns Cognitive Distortions
     'all-or-nothing': {
       name: 'All-or-Nothing Thinking',
-      description: 'Seeing things in black and white categories',
+      description: 'Seeing things in absolute, black-and-white categories',
       color: 'text-red-600 bg-red-50 border-red-200'
     },
     'overgeneralization': {
       name: 'Overgeneralization',
-      description: 'Drawing broad conclusions from single events',
+      description: 'Drawing broad negative conclusions from single events',
       color: 'text-orange-600 bg-orange-50 border-orange-200'
     },
     'mental-filter': {
       name: 'Mental Filter',
-      description: 'Focusing only on negative details',
+      description: 'Dwelling on negatives and ignoring positives',
       color: 'text-yellow-600 bg-yellow-50 border-yellow-200'
     },
     'disqualifying-positive': {
       name: 'Disqualifying the Positive',
-      description: 'Dismissing positive experiences',
+      description: 'Insisting that positive qualities don\'t count',
       color: 'text-lime-600 bg-lime-50 border-lime-200'
     },
-    'jumping-to-conclusions': {
-      name: 'Jumping to Conclusions',
-      description: 'Making negative interpretations without evidence',
+    'mind-reading': {
+      name: 'Mind Reading',
+      description: 'Assuming you know what others are thinking',
       color: 'text-green-600 bg-green-50 border-green-200'
+    },
+    'fortune-telling': {
+      name: 'Fortune Telling',
+      description: 'Predicting that things will turn out badly',
+      color: 'text-emerald-600 bg-emerald-50 border-emerald-200'
     },
     'magnification': {
       name: 'Magnification/Catastrophizing',
-      description: 'Exaggerating the importance of negative events',
+      description: 'Blowing negative events out of proportion',
       color: 'text-teal-600 bg-teal-50 border-teal-200'
+    },
+    'minimization': {
+      name: 'Minimization',
+      description: 'Downplaying the importance of positive events',
+      color: 'text-cyan-600 bg-cyan-50 border-cyan-200'
     },
     'emotional-reasoning': {
       name: 'Emotional Reasoning',
-      description: 'Assuming emotions reflect reality',
-      color: 'text-cyan-600 bg-cyan-50 border-cyan-200'
+      description: 'Reasoning from feelings: "I feel it, so it must be true"',
+      color: 'text-sky-600 bg-sky-50 border-sky-200'
     },
     'should-statements': {
       name: 'Should Statements',
-      description: 'Using unrealistic expectations',
+      description: 'Using shoulds, musts, and have-tos that create pressure',
       color: 'text-blue-600 bg-blue-50 border-blue-200'
     },
     'labeling': {
       name: 'Labeling',
-      description: 'Attaching negative labels based on mistakes',
+      description: 'Attaching negative labels: "I\'m a loser" vs "I made a mistake"',
       color: 'text-indigo-600 bg-indigo-50 border-indigo-200'
     },
+    'self-blame': {
+      name: 'Self-Blame',
+      description: 'Blaming yourself for things outside your control',
+      color: 'text-violet-600 bg-violet-50 border-violet-200'
+    },
+    'other-blame': {
+      name: 'Other-Blame',
+      description: 'Blaming others while overlooking your contribution',
+      color: 'text-purple-600 bg-purple-50 border-purple-200'
+    },
+    
+    // Additional Modern CBT Cognitive Distortions
     'personalization': {
       name: 'Personalization',
-      description: 'Taking responsibility for things outside control',
-      color: 'text-purple-600 bg-purple-50 border-purple-200'
+      description: 'Taking responsibility for external events',
+      color: 'text-fuchsia-600 bg-fuchsia-50 border-fuchsia-200'
+    },
+    'control-fallacy': {
+      name: 'Control Fallacy',
+      description: 'Believing you have total control or no control at all',
+      color: 'text-pink-600 bg-pink-50 border-pink-200'
+    },
+    'fallacy-of-fairness': {
+      name: 'Fallacy of Fairness',
+      description: 'Measuring everything against fairness standards',
+      color: 'text-rose-600 bg-rose-50 border-rose-200'
+    },
+    'heavens-reward-fallacy': {
+      name: 'Heaven\'s Reward Fallacy',
+      description: 'Expecting automatic rewards for good deeds',
+      color: 'text-red-500 bg-red-50 border-red-200'
+    },
+    'always-being-right': {
+      name: 'Always Being Right',
+      description: 'Constantly striving to prove you\'re correct',
+      color: 'text-orange-500 bg-orange-50 border-orange-200'
     },
     'comparison': {
       name: 'Comparison',
-      description: 'Making unfair comparisons to others',
-      color: 'text-pink-600 bg-pink-50 border-pink-200'
+      description: 'Making unfair comparisons that diminish self-worth',
+      color: 'text-amber-600 bg-amber-50 border-amber-200'
     },
-    'blame': {
-      name: 'Blame',
-      description: 'Blaming yourself or others excessively',
-      color: 'text-rose-600 bg-rose-50 border-rose-200'
+    'filtering': {
+      name: 'Filtering',
+      description: 'Focusing on single negative detail exclusively',
+      color: 'text-yellow-500 bg-yellow-50 border-yellow-200'
+    },
+    'global-labeling': {
+      name: 'Global Labeling',
+      description: 'Making global judgments from single events',
+      color: 'text-lime-500 bg-lime-50 border-lime-200'
+    },
+    'perfectionism': {
+      name: 'Perfectionism',
+      description: 'Setting unrealistically high standards',
+      color: 'text-green-500 bg-green-50 border-green-200'
+    },
+    'approval-seeking': {
+      name: 'Approval Seeking',
+      description: 'Needing constant validation from others',
+      color: 'text-emerald-500 bg-emerald-50 border-emerald-200'
+    },
+    'change-fallacy': {
+      name: 'Change Fallacy',
+      description: 'Believing others must change for you to be happy',
+      color: 'text-teal-500 bg-teal-50 border-teal-200'
     }
   };
   

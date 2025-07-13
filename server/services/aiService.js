@@ -3,55 +3,106 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 // Initialize Gemini AI client
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// Cognitive distortion definitions for AI context
+// Comprehensive cognitive distortion definitions for AI context (David Burns + Modern CBT)
 const COGNITIVE_DISTORTIONS = {
+  // Core David Burns Cognitive Distortions
   'all-or-nothing': {
     name: 'All-or-Nothing Thinking',
-    description: 'Seeing things in black and white categories, with no middle ground'
+    description: 'Seeing things in absolute, black-and-white categories with no middle ground'
   },
   'overgeneralization': {
     name: 'Overgeneralization',
-    description: 'Drawing broad conclusions from a single event or piece of evidence'
+    description: 'Drawing broad negative conclusions from a single event or piece of evidence'
   },
   'mental-filter': {
     name: 'Mental Filter',
-    description: 'Focusing exclusively on negative details while ignoring positive aspects'
+    description: 'Dwelling on negatives and ignoring positives, filtering out good things'
   },
   'disqualifying-positive': {
     name: 'Disqualifying the Positive',
-    description: 'Dismissing positive experiences as not counting or being flukes'
+    description: 'Insisting that positive qualities, experiences, or accomplishments don\'t count'
   },
-  'jumping-to-conclusions': {
-    name: 'Jumping to Conclusions',
-    description: 'Making negative interpretations without evidence (mind reading or fortune telling)'
+  'mind-reading': {
+    name: 'Mind Reading',
+    description: 'Assuming you know what others are thinking, usually negatively about you'
+  },
+  'fortune-telling': {
+    name: 'Fortune Telling',
+    description: 'Predicting that things will turn out badly without sufficient evidence'
   },
   'magnification': {
     name: 'Magnification/Catastrophizing',
-    description: 'Exaggerating the importance of negative events or minimizing positive ones'
+    description: 'Blowing negative events out of proportion, making mountains out of molehills'
+  },
+  'minimization': {
+    name: 'Minimization',
+    description: 'Shrinking or downplaying the importance of positive events or qualities'
   },
   'emotional-reasoning': {
     name: 'Emotional Reasoning',
-    description: 'Assuming that negative emotions reflect reality'
+    description: 'Reasoning from feelings: "I feel like an idiot, so I must really be one"'
   },
   'should-statements': {
     name: 'Should Statements',
-    description: 'Using should, must, or ought statements that create unrealistic expectations'
+    description: 'Using shoulds, shouldn\'ts, musts, oughts, and have-tos that create pressure and guilt'
   },
   'labeling': {
     name: 'Labeling',
-    description: 'Attaching negative labels to yourself or others based on mistakes'
+    description: 'Attaching negative labels to yourself or others: "I\'m a loser" instead of "I made a mistake"'
   },
+  'self-blame': {
+    name: 'Self-Blame',
+    description: 'Blaming yourself for something you weren\'t entirely responsible for'
+  },
+  'other-blame': {
+    name: 'Other-Blame',
+    description: 'Blaming others and overlooking ways you contributed to the problem'
+  },
+  
+  // Additional Modern CBT Cognitive Distortions
   'personalization': {
     name: 'Personalization',
-    description: 'Taking responsibility for events outside of your control'
+    description: 'Taking responsibility for external events that are outside your control'
+  },
+  'control-fallacy': {
+    name: 'Control Fallacy',
+    description: 'Believing you have either total control over everything or no control at all'
+  },
+  'fallacy-of-fairness': {
+    name: 'Fallacy of Fairness',
+    description: 'Measuring every situation against standards of fairness and resenting when things seem unfair'
+  },
+  'heavens-reward-fallacy': {
+    name: 'Heaven\'s Reward Fallacy',
+    description: 'Expecting that sacrifices and good deeds will automatically be rewarded'
+  },
+  'always-being-right': {
+    name: 'Always Being Right',
+    description: 'Constantly striving to prove that your opinions and actions are correct'
   },
   'comparison': {
     name: 'Comparison',
     description: 'Making unfair comparisons to others that diminish self-worth'
   },
-  'blame': {
-    name: 'Blame',
-    description: 'Blaming yourself or others excessively for problems'
+  'filtering': {
+    name: 'Filtering',
+    description: 'Focusing on a single negative detail and dwelling on it exclusively'
+  },
+  'global-labeling': {
+    name: 'Global Labeling',
+    description: 'Making global judgments about yourself or others based on single events'
+  },
+  'perfectionism': {
+    name: 'Perfectionism',
+    description: 'Setting unrealistically high standards and being overly critical of mistakes'
+  },
+  'approval-seeking': {
+    name: 'Approval Seeking',
+    description: 'Needing constant approval and validation from others to feel worthwhile'
+  },
+  'change-fallacy': {
+    name: 'Change Fallacy',
+    description: 'Believing that others must change for you to be happy or that you can change others'
   }
 };
 
@@ -271,6 +322,115 @@ Please analyze this journal entry for cognitive distortions and provide helpful 
     } catch (error) {
       console.error('Gemini AI connection test failed:', error);
       return false;
+    }
+  }
+
+  /**
+   * Detect mood/emotion from journal content using AI
+   * @param {string} content - Journal entry content
+   * @param {string} title - Journal entry title (optional)
+   * @returns {Promise<Object>} Detected mood and confidence
+   */
+  async detectMood(content, title = '') {
+    try {
+      if (!process.env.GEMINI_API_KEY) {
+        throw new Error('Gemini API key not configured');
+      }
+
+      const model = genAI.getGenerativeModel({ 
+        model: "gemini-2.0-flash-exp",
+        generationConfig: {
+          temperature: 0.2,
+          topK: 20,
+          topP: 0.8,
+          maxOutputTokens: 256,
+        }
+      });
+
+      const moodPrompt = `You are an expert emotion detection AI. Analyze the following journal entry and determine the primary emotional tone/mood.
+
+AVAILABLE MOODS (choose the most accurate one):
+- very-happy: Extremely joyful, ecstatic, euphoric
+- happy: Joyful, pleased, cheerful, positive
+- content: Satisfied, peaceful, calm, stable
+- neutral: Balanced, neither positive nor negative
+- slightly-sad: Mildly down, disappointed, subdued
+- sad: Unhappy, sorrowful, melancholic
+- very-sad: Deeply depressed, devastated, despairing
+- anxious: Worried, nervous, apprehensive, fearful
+- stressed: Overwhelmed, pressured, tense
+- angry: Frustrated, irritated, furious, hostile
+- frustrated: Annoyed, blocked, hindered
+- excited: Enthusiastic, energetic, thrilled
+- grateful: Thankful, appreciative, blessed
+- hopeful: Optimistic, expectant, confident about future
+- confused: Uncertain, perplexed, unclear
+- overwhelmed: Too much to handle, swamped
+
+INSTRUCTIONS:
+1. Read the journal entry carefully
+2. Identify the dominant emotional tone
+3. Consider both explicit emotional words and implicit emotional context
+4. Choose the single most accurate mood from the list above
+5. Provide a confidence score (0.0-1.0)
+6. Give a brief explanation for your choice
+
+JOURNAL ENTRY:
+Title: ${title}
+Content: ${content}
+
+Respond with ONLY valid JSON in this format:
+{
+  "mood": "detected-mood-key",
+  "confidence": 0.85,
+  "explanation": "Brief explanation of why this mood was detected"
+}`;
+
+      const result = await model.generateContent(moodPrompt);
+      const response = await result.response;
+      let text = response.text().trim();
+
+      // Clean the response to extract JSON
+      if (text.startsWith('```json')) {
+        text = text.replace(/```json\n?/, '').replace(/\n?```$/, '');
+      } else if (text.startsWith('```')) {
+        text = text.replace(/```\n?/, '').replace(/\n?```$/, '');
+      }
+
+      const moodResult = JSON.parse(text);
+
+      // Validate the detected mood
+      const validMoods = [
+        'very-happy', 'happy', 'content', 'neutral', 'slightly-sad', 'sad', 'very-sad',
+        'anxious', 'stressed', 'angry', 'frustrated', 'excited', 'grateful', 
+        'hopeful', 'confused', 'overwhelmed'
+      ];
+
+      if (!validMoods.includes(moodResult.mood)) {
+        // Fallback to neutral if invalid mood detected
+        return {
+          mood: 'neutral',
+          confidence: 0.5,
+          explanation: 'Could not determine specific mood, defaulting to neutral'
+        };
+      }
+
+      return {
+        mood: moodResult.mood,
+        confidence: Math.max(0, Math.min(1, moodResult.confidence || 0.5)),
+        explanation: moodResult.explanation || 'Mood detected from content analysis'
+      };
+
+    } catch (error) {
+      console.error('Mood detection error:', error);
+      
+      // Fallback to neutral mood
+      return {
+        mood: 'neutral',
+        confidence: 0.5,
+        explanation: 'Error in mood detection, defaulting to neutral',
+        error: error.message
+      };
     }
   }
 
